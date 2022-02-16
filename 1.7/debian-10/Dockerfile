@@ -14,10 +14,21 @@ RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "apache" "2.4.52-
 RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "mysql-client" "10.4.24-0" --checksum 5982d7837e92b466961a02300333d746e70136ba54992431ce039a10797d8e8f
 RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "libphp" "7.4.27-6" --checksum bff2748eb1fb7b9ebcd40a5b660985e17cdccecb0acda003a453d84de99c61bc
 RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "render-template" "1.0.1-7" --checksum ed811d10882450d4755b893d5e034a0dd912cdb4f261dd332ddf6363411cc0ba
-RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "prestashop" "1.7.8-3-1" --checksum a0fc89bbcf3ae7c385209e174d57738ec95031857a74c55150af67885184a7ed
+# RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "prestashop" "1.7.8-3-1" --checksum a0fc89bbcf3ae7c385209e174d57738ec95031857a74c55150af67885184a7ed
 RUN . /opt/bitnami/scripts/libcomponent.sh && component_unpack "gosu" "1.14.0-4" --checksum ec62006ece7e0b49c65926e458ba2b71d6d251552118b1378840b1803dbb3d53
-RUN apt-get update && apt-get upgrade -y && \
-    rm -r /var/lib/apt/lists /var/cache/apt/archives
+RUN apt-get update && apt-get upgrade -y 
+RUN apt-get install -y unzip
+RUN rm -r /var/lib/apt/lists /var/cache/apt/archives
+
+RUN mkdir -p /tmpd
+COPY archive/* /tmpd/
+RUN unzip /tmpd/prestashop_*.zip -d /tmpd
+RUN mkdir -p /opt/bitnami/prestashop
+RUN unzip /tmpd/prestashop.zip -d /opt/bitnami/prestashop
+RUN rm -rf /tmpd
+
+RUN chown -R daemon /opt/bitnami/prestashop
+
 RUN chmod g+rwX /opt/bitnami
 
 COPY rootfs /
@@ -33,6 +44,10 @@ ENV APACHE_HTTPS_PORT_NUMBER="" \
     PATH="/opt/bitnami/php/bin:/opt/bitnami/php/sbin:/opt/bitnami/apache/bin:/opt/bitnami/mysql/bin:/opt/bitnami/common/bin:/opt/bitnami/prestashop/bin:$PATH"
 
 EXPOSE 8080 8443
+
+RUN chmod 775 /opt/bitnami/prestashop
+RUN chmod 775 /opt/bitnami
+RUN chmod 775 /opt
 
 USER 1001
 ENTRYPOINT [ "/opt/bitnami/scripts/prestashop/entrypoint.sh" ]
