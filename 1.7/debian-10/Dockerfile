@@ -27,9 +27,7 @@ RUN mkdir -p /opt/bitnami/prestashop
 RUN unzip /tmpd/prestashop.zip -d /opt/bitnami/prestashop
 RUN rm -rf /tmpd
 
-RUN chown -R daemon /opt/bitnami/prestashop
-
-RUN chmod g+rwX /opt/bitnami
+# RUN chmod g+rwX /opt/bitnami
 
 COPY rootfs /
 RUN /opt/bitnami/scripts/mysql-client/postunpack.sh
@@ -45,9 +43,7 @@ ENV APACHE_HTTPS_PORT_NUMBER="" \
 
 EXPOSE 8080 8443
 
-RUN chmod 775 /opt/bitnami/prestashop
-RUN chmod 775 /opt/bitnami
-RUN chmod 775 /opt
+RUN chmod g+rwX /opt/bitnami
 
 USER 1001
 ENTRYPOINT [ "/opt/bitnami/scripts/prestashop/entrypoint.sh" ]
